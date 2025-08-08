@@ -1,79 +1,68 @@
 return {
-  {
-    "williamboman/mason.nvim",
-    opts = {
-      -- Don't add jdtls (Java) to this as that is installed and managed by the nvim-java plugin
-      -- These are the ones that are not supported in mason-lspconfig.
-      ensure_installed = {
-        "markdownlint",
-      },
-    },
-  },
-  {
-    "williamboman/mason-lspconfig.nvim",
-    opts = {
-      -- Don't add jdtls (Java) to this as that is installed and managed by the nvim-java plugin
-      ensure_installed = {
-        "bashls",
-        "cssls",
-        "eslint",
-        "gopls",
-        "helm_ls",
-        "html",
-        "jsonls",
-        "marksman",
-        "phpactor",
-        "tsserver",
-        "volar",
-      },
-    },
-    handlers = {
-      -- default handler (optional)
-      function(server_name)
-        require("lspconfig")[server_name].setup({})
-      end,
+  recommended = function()
+    return LazyVim.extras.wants({
+      ft = "vue",
+      root = { "vue.config.js" },
+    })
+  end,
 
-      -- language-server specific setup handlers.
-      --
-      -- This is no longer required but is an example of how to write a handler
-      -- ["volar"] = function()
-      --   require("lspconfig").volar.setup({
-      --     filetypes = { "vue", "javascript", "typescript", "typescriptreact", "javascriptreact" },
-      --     init_options = {
-      --       vue = {
-      --         hybridMode = false,
-      --       },
-      --       typescript = {
-      --         tsdk = vim.fn.getcwd() .. "node_modules/typescript/lib",
-      --       },
-      --     },
-      --   })
-      -- end,
-    },
-  },
-  {
-    "nvim-lspconfig",
-    keys = {
-      { "<leader>ce", "<cmd>EslintFixAll<cr>", desc = "ESLint Fix All" },
-    },
-    opts = {
-      setup = {
-        tsserver = function(_, opts)
-          local mason_registry = require("mason-registry")
-          local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path()
-            .. "/node_modules/@vue/language-server"
+  -- depends on the typescript extra
+  { import = "lazyvim.plugins.extras.lang.typescript" },
 
-          opts.init_options = {
-            plugins = {
-              {
-                name = "@vue/typescript-plugin",
-                location = vue_language_server_path,
-                languages = { "vue" },
-              },
-            },
-          }
-          opts.filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" }
-        end,
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = { ensure_installed = { "vue", "css" } },
+  },
+
+  -- Configure vtsls (the TypeScript plugin host) with @vue/typescript-plugin
+  {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      opts.servers.vtsls = opts.servers.vtsls or {}
+      opts.servers.vtsls.filetypes = opts.servers.vtsls.filetypes or {}
+      table.insert(opts.servers.vtsls.filetypes, "vue")
+      LazyVim.extend(opts.servers.vtsls, "settings.vtsls.tsserver.globalPlugins", {
+        {
+          name = "@vue/typescript-plugin",
+          location = LazyVim.get_pkg_path("vue-language-server", "/node_modules/@vue/language-server"),
+          languages = { "vue" },
+          configNamespace = "typescript",
+          enableForWorkspaceTypeScriptVersions = true,
+        },
+      })
+    end,
+  },
+
+  -- Hook vue_ls to forward requests to vtsls
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        volar = { -- when LazyVim switches to nvim-lspconfig ≥ v2.2.0 rename this to `vue_ls`
+          on_init = function(client)
+            client.handlers["tsserver/request"] = function(_, result, context)
+              -- find the vtsls client
+              local clients = vim.lsp.get_clients({ bufnr = context.bufnr, name = "vtsls" })
+              if #clients == 0 then
+                vim.notify("Could not find `vtsls` client, Vue LSP features will be disabled", vim.log.levels.ERROR)
+                return
+              end
+              local ts_client = clients[1]
+              -- unpack the forwarded request
+              local params = unpack(result)
+              local id, command, payload = unpack(params)
+              -- forward it
+              ts_client:exec_cmd({
+                title = "vue_request_forward",
+                command = "typescript.tsserverRequest",
+                arguments = { command, payload },
+              }, { bufnr = context.bufnr }, function(_, resp)
+                -- send the tsserver/response back to Vue LSP
+                client.notify("tsserver/response", { { id, resp.body } })
+              end)
+            end
+          end,
+        },
       },
     },
   },

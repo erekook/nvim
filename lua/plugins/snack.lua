@@ -5,10 +5,11 @@ return {
     ---@type snacks.Config
     opts = {
       picker = {
-        -- your picker configuration comes here
-        -- or leave it empty to use the default settings
-        -- refer to the configuration section below
-        hidden = true,
+        formatters = {
+          file = {
+            truncate = false, -- 禁用路径截断，显示完整路径
+          },
+        },
       },
     },
   },

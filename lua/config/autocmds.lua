@@ -22,3 +22,11 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
   end,
   desc = "Treat .wxss files as css",
 })
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.wxs",
+  callback = function()
+    vim.bo.filetype = "javascript" -- 将 .wxss 设置为 css 文件类型
+  end,
+  desc = "Treat .wxs files as javascript",
+})
