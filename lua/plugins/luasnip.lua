@@ -1,3 +1,4 @@
+-- 自定义代码片段 lua/snippets/*.lua
 return {
   "L3MON4D3/LuaSnip",
   config = function()

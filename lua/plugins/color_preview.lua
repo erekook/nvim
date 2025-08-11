@@ -1,3 +1,4 @@
+-- 代码中显示色值
 return {
   {
     "NvChad/nvim-colorizer.lua",

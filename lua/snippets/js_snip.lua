@@ -19,13 +19,6 @@ ls.add_snippets("javascript", {
     t(");"),
     i(0), -- 最后一个插入点，光标最终停留位置
   }),
-  s("sd", {
-    t("this.setData({"),
-    t({ "", "\t" }), -- 换行并添加缩进
-    i(1, "key: value"), -- 插入点，占位符为 "key: value"
-    t({ "", "});" }), -- 换行并关闭
-    i(0), -- 光标最终位置
-  }),
 })
 
 ls.add_snippets("typescript", {

@@ -5,7 +5,15 @@ local i = ls.insert_node
 -- local f = ls.function_node
 
 ls.add_snippets("javascript", {
-  -- 1. wx.navigateTo (跳转到非 TabBar 页面，保留当前页面)
+  -- this.setData
+  s("sd", {
+    t("this.setData({"),
+    t({ "", "\t" }), -- 换行并添加缩进
+    i(1, "key: value"), -- 插入点，占位符为 "key: value"
+    t({ "", "});" }), -- 换行并关闭
+    i(0), -- 光标最终位置
+  }),
+  -- wx.navigateTo (跳转到非 TabBar 页面，保留当前页面)
   s("wx-nt", {
     t({ "wx.navigateTo({", "\turl: '" }),
     i(1, "/pages/index/index"), -- 目标页面路径
@@ -16,7 +24,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 2. wx.redirectTo (跳转到非 TabBar 页面，关闭当前页面)
+  -- wx.redirectTo (跳转到非 TabBar 页面，关闭当前页面)
   s("wx-rt", {
     t({ "wx.redirectTo({", "\turl: '" }),
     i(1, "/pages/index/index"), -- 目标页面路径
@@ -27,7 +35,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 3. wx.switchTab (跳转到 TabBar 页面)
+  -- wx.switchTab (跳转到 TabBar 页面)
   s("wx-st", {
     t({ "wx.switchTab({", "\turl: '" }),
     i(1, "/pages/home/home"), -- TabBar 页面路径
@@ -38,14 +46,14 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 4. wx.navigateBack (返回上一页面或多级页面)
+  -- wx.navigateBack (返回上一页面或多级页面)
   s("wx-nb", {
     t({ "wx.navigateBack({", "\tdelta: " }),
     i(1, "1"), -- 返回的页面数
     t({ "", "});" }),
   }),
 
-  -- 5. wx.reLaunch (关闭所有页面，跳转到指定页面)
+  -- wx.reLaunch (关闭所有页面，跳转到指定页面)
   s("wx-rl", {
     t({ "wx.reLaunch({", "\turl: '" }),
     i(1, "/pages/index/index"), -- 目标页面路径
@@ -56,7 +64,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 1. wx.showToast (显示提示框)
+  -- wx.showToast (显示提示框)
   s("wxtoast", {
     t({ "wx.showToast({", "\ttitle: '" }),
     i(1, "提示信息"), -- 提示内容
@@ -71,7 +79,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 2. wx.showModal (显示模态对话框)
+  -- wx.showModal (显示模态对话框)
   s("wxmodal", {
     t({ "wx.showModal({", "\ttitle: '" }),
     i(1, "提示"), -- 对话框标题
@@ -97,7 +105,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 3. wx.showLoading (显示加载提示)
+  -- wx.showLoading (显示加载提示)
   s("wxloading", {
     t({ "wx.showLoading({", "\ttitle: '" }),
     i(1, "加载中"), -- 加载提示文字
@@ -110,7 +118,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 4. wx.hideLoading (隐藏加载提示)
+  -- wx.hideLoading (隐藏加载提示)
   s("wxhideloading", {
     t({ "wx.hideLoading({", "\tsuccess: (res) => {" }),
     i(1, "console.log('Loading hidden');"), -- 成功回调
@@ -119,7 +127,7 @@ ls.add_snippets("javascript", {
     t({ "", "\t}", "});" }),
   }),
 
-  -- 5. wx.showActionSheet (显示动作菜单)
+  -- wx.showActionSheet (显示动作菜单)
   s("wxactionsheet", {
     t({ "wx.showActionSheet({", "\titemList: [" }),
     i(1, "'选项1', '选项2', '选项3'"), -- 菜单选项列表
